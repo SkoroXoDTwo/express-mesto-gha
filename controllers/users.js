@@ -1,17 +1,23 @@
 const User = require('../models/user');
+const DataNotFoundError = require('../utils/Errors/DataNotFoundError');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка2' }));
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   const { id } = req.params;
 
   User.findById(id)
+    .orFail(() => {
+      throw new DataNotFoundError('Пользователь не найден');
+    })
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка2' }));
+    .catch((err) => {
+      next(err);
+    });
 };
 
 module.exports.createUser = (req, res) => {

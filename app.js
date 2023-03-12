@@ -21,6 +21,22 @@ app.use((req, res, next) => {
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
+app.use((err, req, res, next) => {
+  console.log(err.name);
+  switch (err.name) {
+    case 'CastError':
+      res.status(400).send({ message: 'Переданы некорректные данные' });
+      break;
+
+    case 'DataNotFoundError':
+      res.status(err.statusCode).send({ message: err.message });
+      break;
+
+    default:
+      res.status(500).send({ message: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
