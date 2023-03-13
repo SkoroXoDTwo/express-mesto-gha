@@ -39,6 +39,7 @@ app.use((err, req, res, next) => {
     default:
       res.status(500).send({ message: err.message });
   }
+  next();
 });
 
 app.listen(PORT, () => {
