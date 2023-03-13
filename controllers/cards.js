@@ -1,30 +1,34 @@
 const Card = require('../models/card');
+const DataNotFoundError = require('../utils/Errors/DataNotFoundError');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => next(err));
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const { _id } = req.user;
 
   Card.create({ name, link, owner: _id })
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => next(err));
 };
 
-module.exports.deleteCard = (req, res) => {
-  const { id } = req.params;
+module.exports.deleteCard = (req, res, next) => {
+  const { cardId } = req.params;
 
-  Card.findByIdAndRemove(id)
+  Card.findByIdAndRemove(cardId)
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err, card) => {
+      if (!card) { next(new DataNotFoundError('Карточка не найдена')); }
+      next(err);
+    });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id } = req.user;
 
@@ -35,10 +39,13 @@ module.exports.likeCard = (req, res) => {
   )
     .populate(['owner', 'likes'])
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err, card) => {
+      if (!card) next(new DataNotFoundError('Карточки не существует'));
+      next(err);
+    });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id } = req.user;
 
@@ -49,5 +56,8 @@ module.exports.dislikeCard = (req, res) => {
   )
     .populate(['owner', 'likes'])
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err, card) => {
+      if (!card) next(new DataNotFoundError('Карточки не существует'));
+      next(err);
+    });
 };

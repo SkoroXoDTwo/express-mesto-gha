@@ -1,10 +1,10 @@
 const User = require('../models/user');
 const DataNotFoundError = require('../utils/Errors/DataNotFoundError');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => next(err));
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -15,20 +15,18 @@ module.exports.getUser = (req, res, next) => {
       throw new DataNotFoundError('Пользователь не найден');
     })
     .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      next(err);
-    });
+    .catch((err) => next(err));
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => next(err));
 };
 
-module.exports.updateUserProfile = (req, res) => {
+module.exports.updateUserProfile = (req, res, next) => {
   const { name, about } = req.body;
   const { _id } = req.user;
 
@@ -40,11 +38,18 @@ module.exports.updateUserProfile = (req, res) => {
       runValidators: true,
     },
   )
-    .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((err, user) => {
+      if (!user && err.name !== 'ValidationError') {
+        next(new DataNotFoundError('Пользователь не найден'));
+      }
+      next(err);
+    });
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const { _id } = req.user;
 
@@ -57,5 +62,10 @@ module.exports.updateUserAvatar = (req, res) => {
     },
   )
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err, user) => {
+      if (!user && err.name !== 'ValidationError') {
+        next(new DataNotFoundError('Пользователь не найден'));
+      }
+      next(err);
+    });
 };

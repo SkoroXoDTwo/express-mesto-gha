@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const { PORT = 3000 } = process.env;
 const app = express();
 
+mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(bodyParser.json());
@@ -22,14 +23,17 @@ app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
 app.use((err, req, res, next) => {
-  console.log(err.name);
   switch (err.name) {
     case 'CastError':
       res.status(400).send({ message: 'Переданы некорректные данные' });
       break;
 
+    case 'ValidationError':
+      res.status(400).send({ message: 'Переданы некорректные данные' });
+      break;
+
     case 'DataNotFoundError':
-      res.status(err.statusCode).send({ message: err.message });
+      res.status(404).send({ message: err.message });
       break;
 
     default:
