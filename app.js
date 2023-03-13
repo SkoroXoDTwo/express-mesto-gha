@@ -43,7 +43,7 @@ app.use((err, req, res, next) => {
       break;
 
     default:
-      res.status(500).send({ message: err.message });
+      res.status(500).send({ message: 'На сервере произошла ошибка' });
   }
   next();
 });

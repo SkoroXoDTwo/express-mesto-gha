@@ -23,7 +23,7 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        throw new DataNotFoundError('Карточка не существует');
+        next(new DataNotFoundError('Карточка не существует'));
       }
       res.send({ data: card });
     })
@@ -44,7 +44,7 @@ module.exports.likeCard = (req, res, next) => {
     .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
-        throw new DataNotFoundError('Карточка не существует');
+        next(new DataNotFoundError('Карточка не существует'));
       }
       res.send({ data: card });
     })
@@ -65,7 +65,7 @@ module.exports.dislikeCard = (req, res, next) => {
     .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
-        throw new DataNotFoundError('Карточка не существует');
+        next(new DataNotFoundError('Карточка не существует'));
       }
       res.send({ data: card });
     })

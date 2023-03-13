@@ -12,7 +12,7 @@ module.exports.getUser = (req, res, next) => {
 
   User.findById(id)
     .orFail(() => {
-      throw new DataNotFoundError('Пользователь не найден');
+      next(new DataNotFoundError('Пользователь не найден'));
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => next(err));
