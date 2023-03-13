@@ -21,13 +21,14 @@ module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findByIdAndRemove(cardId)
-    .then((card) => res.send({ data: card }))
-    .catch((err, card) => {
+    .then((card) => {
       if (!card) {
-        next(new DataNotFoundError('Карточка не существует'));
-      } else {
-        next(err);
+        throw new DataNotFoundError('Карточка не существует');
       }
+      res.send({ data: card });
+    })
+    .catch((err) => {
+      next(err);
     });
 };
 
@@ -41,13 +42,14 @@ module.exports.likeCard = (req, res, next) => {
     { new: true },
   )
     .populate(['owner', 'likes'])
-    .then((card) => res.send({ data: card }))
-    .catch((err, card) => {
+    .then((card) => {
       if (!card) {
-        next(new DataNotFoundError('Карточка не существует'));
-      } else {
-        next(err);
+        throw new DataNotFoundError('Карточка не существует');
       }
+      res.send({ data: card });
+    })
+    .catch((err) => {
+      next(err);
     });
 };
 
@@ -61,12 +63,13 @@ module.exports.dislikeCard = (req, res, next) => {
     { new: true },
   )
     .populate(['owner', 'likes'])
-    .then((card) => res.send({ data: card }))
-    .catch((err, card) => {
+    .then((card) => {
       if (!card) {
-        next(new DataNotFoundError('Карточка не существует'));
-      } else {
-        next(err);
+        throw new DataNotFoundError('Карточка не существует');
       }
+      res.send({ data: card });
+    })
+    .catch((err) => {
+      next(err);
     });
 };

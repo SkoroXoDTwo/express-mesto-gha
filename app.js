@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
+const DataNotFoundError = require('./utils/Errors/DataNotFoundError');
+
 const { PORT = 3000 } = process.env;
 const app = express();
 
@@ -21,6 +23,10 @@ app.use((req, res, next) => {
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
+
+app.use('*', (req, res, next) => {
+  next(new DataNotFoundError('Запрашиваемый адрес не найден.'));
+});
 
 app.use((err, req, res, next) => {
   switch (err.name) {
