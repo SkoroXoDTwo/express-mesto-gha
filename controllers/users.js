@@ -11,9 +11,7 @@ module.exports.getUser = (req, res, next) => {
   const { id } = req.params;
 
   User.findById(id)
-    .orFail(() => {
-      next(new DataNotFoundError('Пользователь не найден'));
-    })
+    .orFail(() => next(new DataNotFoundError('Пользователь не найден')))
     .then((user) => res.send({ data: user }))
     .catch((err) => next(err));
 };
@@ -38,15 +36,8 @@ module.exports.updateUserProfile = (req, res, next) => {
       runValidators: true,
     },
   )
-    .then((user) => {
-      res.send({ data: user });
-    })
-    .catch((err, user) => {
-      if (!user && err.name !== 'ValidationError') {
-        next(new DataNotFoundError('Пользователь не найден'));
-      }
-      next(err);
-    });
+    .then((user) => res.send({ data: user }))
+    .catch((err) => next(err));
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
@@ -62,10 +53,5 @@ module.exports.updateUserAvatar = (req, res, next) => {
     },
   )
     .then((user) => res.send({ data: user }))
-    .catch((err, user) => {
-      if (!user && err.name !== 'ValidationError') {
-        next(new DataNotFoundError('Пользователь не найден'));
-      }
-      next(err);
-    });
+    .catch((err) => next(err));
 };

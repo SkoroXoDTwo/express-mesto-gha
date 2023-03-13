@@ -24,8 +24,9 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         next(new DataNotFoundError('Карточка не существует'));
+      } else {
+        res.send({ data: card });
       }
-      res.send({ data: card });
     })
     .catch((err) => {
       next(err);
@@ -45,8 +46,9 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         next(new DataNotFoundError('Карточка не существует'));
+      } else {
+        res.send({ data: card });
       }
-      res.send({ data: card });
     })
     .catch((err) => {
       next(err);
@@ -66,8 +68,9 @@ module.exports.dislikeCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         next(new DataNotFoundError('Карточка не существует'));
+      } else {
+        res.send({ data: card });
       }
-      res.send({ data: card });
     })
     .catch((err) => {
       next(err);
