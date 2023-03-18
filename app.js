@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { errors } = require('celebrate');
+const { errors, isCelebrateError } = require('celebrate');
 
 const DataNotFoundError = require('./errors/DataNotFoundError');
 
@@ -31,6 +31,12 @@ app.use('*', (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  if (isCelebrateError(err)) {
+    console.log(err);
+    res.status(400).send({ message: `На сервере произошла ошибка: ${err.details.get('body').details[0].message}` });
+    return;
+  }
+
   switch (err) {
     case 'CastError':
       res.status(400).send({ message: 'Переданы некорректные данные' });
@@ -45,7 +51,7 @@ app.use((err, req, res, next) => {
       break;
 
     default:
-      res.status(500).send({ message: `На сервере произошла ошибка: ${err}` });
+      res.status(500).send({ message: `На сервере произошла ошибка: ${err.details}` });
   }
   next();
 });
