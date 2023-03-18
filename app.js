@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 
 const DataNotFoundError = require('./errors/DataNotFoundError');
 
@@ -12,6 +13,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(errors());
 
 app.use((req, res, next) => {
   req.user = {
@@ -29,7 +31,7 @@ app.use('*', (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  switch (err.name) {
+  switch (err) {
     case 'CastError':
       res.status(400).send({ message: 'Переданы некорректные данные' });
       break;
@@ -43,7 +45,7 @@ app.use((err, req, res, next) => {
       break;
 
     default:
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      res.status(500).send({ message: `На сервере произошла ошибка: ${err}` });
   }
   next();
 });
