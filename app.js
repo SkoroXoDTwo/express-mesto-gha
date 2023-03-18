@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors, isCelebrateError } = require('celebrate');
 
+const {
+  createUser, login,
+} = require('./controllers/users');
+
 const DataNotFoundError = require('./errors/DataNotFoundError');
 
 const { PORT = 3000 } = process.env;
@@ -22,6 +26,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
