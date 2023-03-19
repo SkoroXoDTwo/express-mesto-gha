@@ -21,7 +21,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(errors());
 
 app.post('/signin', validationSignin, login);
 app.post('/signup', validationSignup, createUser);
@@ -35,6 +34,7 @@ app.use('*', (req, res, next) => {
   next(new DataNotFoundError('Запрашиваемый адрес не найден.'));
 });
 
+app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {

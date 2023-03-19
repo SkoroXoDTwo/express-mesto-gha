@@ -1,10 +1,4 @@
-const { isCelebrateError } = require('celebrate');
-
 module.exports = (err, req, res, next) => {
-  if (isCelebrateError(err)) {
-    res.status(400).send(err);
-  }
-
   if (err.code === 11000) {
     res.status(409).send({ message: 'Пользователь с таким email уже зарегестрирован' });
     return;
