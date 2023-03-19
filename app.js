@@ -1,7 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { errors, isCelebrateError } = require('celebrate');
+const { errors } = require('celebrate');
+
+const { validationSignup, validationSignin } = require('./utils/validation');
 
 const {
   createUser, login,
@@ -9,6 +11,7 @@ const {
 
 const DataNotFoundError = require('./errors/DataNotFoundError');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/errorHandler');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -20,8 +23,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(errors());
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', validationSignin, login);
+app.post('/signup', validationSignup, createUser);
 
 app.use(auth);
 
@@ -32,31 +35,7 @@ app.use('*', (req, res, next) => {
   next(new DataNotFoundError('Запрашиваемый адрес не найден.'));
 });
 
-app.use((err, req, res, next) => {
-  if (isCelebrateError(err)) {
-    console.log(err);
-    res.status(400).send({ message: `На сервере произошла ошибка: ${err.details.get('body').details[0].message}` });
-    return;
-  }
-
-  switch (err) {
-    case 'CastError':
-      res.status(400).send({ message: 'Переданы некорректные данные' });
-      break;
-
-    case 'ValidationError':
-      res.status(400).send({ message: 'Переданы некорректные данные' });
-      break;
-
-    case 'DataNotFoundError':
-      res.status(404).send({ message: err.message });
-      break;
-
-    default:
-      res.status(500).send({ message: `На сервере произошла ошибка: ${err}` });
-  }
-  next();
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

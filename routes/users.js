@@ -1,28 +1,18 @@
 const router = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
+const { validationUpdateUserProfile, validationGetUser, validationUpdateUserAvatar } = require('../utils/validation');
 
 const {
-  getUsers, getUser, createUser, updateUserProfile, updateUserAvatar, getUserMe,
+  getUsers, getUser, updateUserProfile, updateUserAvatar, getUserMe,
 } = require('../controllers/users');
 
 router.get('/', getUsers);
 
 router.get('/me', getUserMe);
 
-router.get('/:id', getUser);
+router.get('/:id', validationGetUser, getUser);
 
-router.post('/', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string(),
-    about: Joi.string(),
-    avatar: Joi.string(),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), createUser);
+router.patch('/me', validationUpdateUserProfile, updateUserProfile);
 
-router.patch('/me', updateUserProfile);
-
-router.patch('/me/avatar', updateUserAvatar);
+router.patch('/me/avatar', validationUpdateUserAvatar, updateUserAvatar);
 
 module.exports = router;

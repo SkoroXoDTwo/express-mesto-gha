@@ -10,19 +10,19 @@ module.exports.getUsers = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-module.exports.getUser = (req, res, next) => {
-  const { id } = req.params;
+module.exports.getUserMe = (req, res, next) => {
+  const { _id } = req.user;
 
-  User.findById(id)
+  User.findById(_id)
     .orFail(() => next(new DataNotFoundError('Пользователь не найден')))
     .then((user) => res.send({ data: user }))
     .catch((err) => next(err));
 };
 
-module.exports.getUserMe = (req, res, next) => {
-  const { _id } = req.user;
+module.exports.getUser = (req, res, next) => {
+  const { id } = req.params;
 
-  User.findById(_id)
+  User.findById(id)
     .orFail(() => next(new DataNotFoundError('Пользователь не найден')))
     .then((user) => res.send({ data: user }))
     .catch((err) => next(err));
