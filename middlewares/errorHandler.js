@@ -2,7 +2,7 @@ const { isCelebrateError } = require('celebrate');
 
 module.exports = (err, req, res, next) => {
   if (isCelebrateError(err)) {
-    res.status(400).send({ message: err.message });
+    res.status(400).send(err);
   }
 
   if (err.code === 11000) {
@@ -28,7 +28,8 @@ module.exports = (err, req, res, next) => {
       break;
 
     default:
-      res.status(500).send({ message: `На сервере произошла ошибка: ${err}` });
+      res.status(500).send({ message: `На сервере произошла ошибка: ${err.message}` });
   }
+
   next();
 };
