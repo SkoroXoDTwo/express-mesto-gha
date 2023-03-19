@@ -19,6 +19,15 @@ module.exports.getUser = (req, res, next) => {
     .catch((err) => next(err));
 };
 
+module.exports.getUserMe = (req, res, next) => {
+  const { _id } = req.user;
+
+  User.findById(_id)
+    .orFail(() => next(new DataNotFoundError('Пользователь не найден')))
+    .then((user) => res.send({ data: user }))
+    .catch((err) => next(err));
+};
+
 module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
@@ -71,19 +80,8 @@ module.exports.updateUserAvatar = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  User.findOne({ email })
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        next(new DataNotFoundError('Пользователь не найден'));
-      }
-
-      return bcrypt.compare(password, user.password);
-    })
-    .then((user) => {
-      if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
-      }
-
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.send({ token });
     })

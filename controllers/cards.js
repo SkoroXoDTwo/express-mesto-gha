@@ -19,18 +19,20 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
+  const { _id } = req.user;
 
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
         next(new DataNotFoundError('Карточка не существует'));
+      } else if (_id !== card.owner.toString()) {
+        next(new DataNotFoundError('Недостаточно прав'));
       } else {
+        card.remove();
         res.send({ data: card });
       }
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.likeCard = (req, res, next) => {
