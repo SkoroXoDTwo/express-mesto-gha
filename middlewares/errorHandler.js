@@ -2,14 +2,7 @@ const { isCelebrateError } = require('celebrate');
 
 module.exports = (err, req, res, next) => {
   if (isCelebrateError(err)) {
-    if (err.details.has('body')) {
-      res.status(400).send({ message: `Переданы некорректные данные: ${err.details.get('body').details[0].message}` });
-      return;
-    }
-    if (err.details.has('params')) {
-      res.status(400).send({ message: `Переданы некорректные данные: ${err.details.get('params').details[0].message}` });
-      return;
-    }
+    res.status(400).send({ message: err.message });
   }
 
   if (err.code === 11000) {
