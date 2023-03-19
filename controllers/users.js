@@ -41,7 +41,12 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      const userData = user.toObject();
+      delete userData.password;
+
+      res.send({ data: userData });
+    })
     .catch((err) => next(err));
 };
 
