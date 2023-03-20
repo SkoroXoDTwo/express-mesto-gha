@@ -9,7 +9,7 @@ router.get('/', getUsers);
 
 router.get('/me', getUserMe);
 
-router.get('/:id', validationGetUser, getUser);
+router.get('/:userId', validationGetUser, getUser);
 
 router.patch('/me', validationUpdateUserProfile, updateUserProfile);
 

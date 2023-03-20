@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
-const TokeIsIncorrectError = require('../errors/TokeIsIncorrectError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return next(new TokeIsIncorrectError());
+    return next(new UnauthorizedError('Некорректный токен'));
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (err) {
-    return next(new TokeIsIncorrectError());
+    return next(new UnauthorizedError('Некорректный токен'));
   }
 
   req.user = payload;
