@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const DataNotFoundError = require('../errors/DataNotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const ConflictError = require('../errors/ConflictError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -15,18 +16,26 @@ module.exports.getUserMe = (req, res, next) => {
   const { _id } = req.user;
 
   User.findById(_id)
-    .orFail(() => next(new DataNotFoundError('Пользователь не найден')))
     .then((user) => res.send({ data: user }))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new DataNotFoundError('Пользователь не найден'));
+      }
+      next(err);
+    });
 };
 
 module.exports.getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .orFail(() => next(new DataNotFoundError('Пользователь не найден')))
     .then((user) => res.send({ data: user }))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new DataNotFoundError('Пользователь не найден'));
+      }
+      next(err);
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -49,6 +58,9 @@ module.exports.createUser = (req, res, next) => {
       res.send({ data: userData });
     })
     .catch((err) => {
+      if (err.code === 11000) {
+        return next(new ConflictError('Пользователь с таким email уже зарегестрирован'));
+      }
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
       }

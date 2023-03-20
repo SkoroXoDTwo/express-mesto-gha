@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const DataNotFoundError = require('../errors/DataNotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -33,7 +34,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         next(new DataNotFoundError('Карточка с указанным _id не найдена.'));
       } else if (_id !== card.owner.toString()) {
-        next(new DataNotFoundError('Недостаточно прав'));
+        next(new ForbiddenError('Недостаточно прав'));
       } else {
         card.remove();
         res.send({ data: card });
