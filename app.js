@@ -1,25 +1,35 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
+
 require('dotenv').config();
 
 const { validationSignup, validationSignin } = require('./utils/validation');
 
-const {
-  createUser, login,
-} = require('./controllers/users');
+const { createUser, login } = require('./controllers/users');
 
-const DataNotFoundError = require('./errors/DataNotFoundError');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
 
+const DataNotFoundError = require('./errors/DataNotFoundError');
+
 const { PORT = 3000 } = process.env;
+
 const app = express();
 
 mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+
+app.use(limiter);
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
