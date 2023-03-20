@@ -16,11 +16,17 @@ module.exports.getUserMe = (req, res, next) => {
   const { _id } = req.user;
 
   User.findById(_id)
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'CastError') {
+    .then((user) => {
+      if (!user) {
         return next(new DataNotFoundError('Пользователь не найден'));
       }
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError('Переданы некорректный id пользователя'));
+      }
+
       next(err);
     });
 };
@@ -29,11 +35,17 @@ module.exports.getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'CastError') {
+    .then((user) => {
+      if (!user) {
         return next(new DataNotFoundError('Пользователь не найден'));
       }
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError('Переданы некорректный id пользователя'));
+      }
+
       next(err);
     });
 };
