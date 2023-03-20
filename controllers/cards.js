@@ -32,13 +32,14 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        next(new DataNotFoundError('Карточка с указанным _id не найдена.'));
-      } else if (_id !== card.owner.toString()) {
-        next(new ForbiddenError('Недостаточно прав'));
-      } else {
-        card.remove();
-        res.send({ data: card });
+        return next(new DataNotFoundError('Карточка с указанным _id не найдена.'));
       }
+      if (_id !== card.owner.toString()) {
+        return next(new ForbiddenError('Недостаточно прав'));
+      }
+
+      card.remove();
+      res.send({ data: card });
     })
     .catch(next);
 };
@@ -55,10 +56,10 @@ module.exports.likeCard = (req, res, next) => {
     .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
-        next(new DataNotFoundError('Передан несуществующий _id карточки.'));
-      } else {
-        res.send({ data: card });
+        return next(new DataNotFoundError('Передан несуществующий _id карточки.'));
       }
+
+      res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -81,10 +82,10 @@ module.exports.dislikeCard = (req, res, next) => {
     .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
-        next(new DataNotFoundError('Передан несуществующий _id карточки.'));
-      } else {
-        res.send({ data: card });
+        return next(new DataNotFoundError('Передан несуществующий _id карточки.'));
       }
+
+      res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
