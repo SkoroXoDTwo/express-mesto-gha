@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
+require('dotenv').config();
 
 const { validationSignup, validationSignin } = require('./utils/validation');
 
