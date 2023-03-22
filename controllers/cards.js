@@ -38,8 +38,9 @@ module.exports.deleteCard = (req, res, next) => {
         return next(new ForbiddenError('Недостаточно прав'));
       }
 
-      card.remove();
-      res.send({ data: card });
+      card.remove()
+        .then(() => res.send({ data: card }))
+        .catch(next);
     })
     .catch(next);
 };
