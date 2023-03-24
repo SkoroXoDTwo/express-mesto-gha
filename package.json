@@ -1,7 +1,7 @@
 {
   "name": "express-mesto-gha",
   "version": "1.0.0",
-  "description": "",
+  "description": "Template of the project work of the Web developer course practicum.yandex",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
