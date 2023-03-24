@@ -33,7 +33,6 @@ module.exports.getUserMe = (req, res, next) => {
 
 module.exports.getUser = (req, res, next) => {
   const { userId } = req.params;
-  console.log(userId);
 
   User.findById(userId)
     .then((user) => {
