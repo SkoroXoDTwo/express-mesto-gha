@@ -1,4 +1,13 @@
 const { celebrate, Joi } = require('celebrate');
+const { isValidObjectId } = require('mongoose');
+
+const customValidationObjectId = (id, helpers) => {
+  if (!isValidObjectId(id)) {
+    return helpers.error('id.invalid');
+  }
+
+  return id;
+};
 
 const validationSignup = celebrate({
   body: Joi.object().keys({
@@ -26,7 +35,7 @@ const validationUpdateUserProfile = celebrate({
 
 const validationGetUser = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().alphanum().length(24),
+    userId: Joi.string().custom(customValidationObjectId, 'custom objectId validation'),
   }),
 });
 
@@ -45,7 +54,7 @@ const validationCreateCard = celebrate({
 
 const validationParamsControllersCards = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().custom(customValidationObjectId, 'custom objectId validation'),
   }),
 });
 
