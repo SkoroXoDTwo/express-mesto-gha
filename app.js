@@ -13,6 +13,7 @@ const { createUser, login } = require('./controllers/users');
 
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const DataNotFoundError = require('./errors/DataNotFoundError');
 
@@ -33,6 +34,7 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(requestLogger);
 app.post('/signin', validationSignin, login);
 app.post('/signup', validationSignup, createUser);
 
@@ -40,6 +42,8 @@ app.use(auth);
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
+
+app.use(errorLogger);
 
 app.use('*', (req, res, next) => {
   next(new DataNotFoundError('Запрашиваемый адрес не найден.'));
