@@ -94,11 +94,14 @@ module.exports.updateUserProfile = (req, res, next) => {
       runValidators: true,
     },
   )
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'DataNotFoundError') {
-        return next(new DataNotFoundError('Пользователь с указанным _id не найден. '));
+    .then((user) => {
+      if (!user) {
+        return next(new BadRequestError('Пользователь с указанным _id не найден'));
       }
+
+      res.send({ data: user });
+    })
+    .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
       }
@@ -119,11 +122,14 @@ module.exports.updateUserAvatar = (req, res, next) => {
       runValidators: true,
     },
   )
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'DataNotFoundError') {
-        return next(new DataNotFoundError('Пользователь с указанным _id не найден. '));
+    .then((user) => {
+      if (!user) {
+        return next(new BadRequestError('Пользователь с указанным _id не найден'));
       }
+
+      res.send({ data: user });
+    })
+    .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные при обновлении аватара.'));
       }

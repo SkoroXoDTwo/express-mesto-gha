@@ -13,7 +13,7 @@ const cardSchema = new mongoose.Schema(
       type: String,
       validate: {
         validator: (v) => validator.isURL(v),
-        message: 'Сылка некорректная',
+        message: 'Ссылка некорректная',
       },
       required: true,
     },
